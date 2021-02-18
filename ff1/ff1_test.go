@@ -23,6 +23,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"testing"
+	"time"
 )
 
 // Test vectors taken from here: http://csrc.nist.gov/groups/ST/toolkit/documents/Examples/FF1samples.pdf
@@ -115,6 +116,9 @@ func TestEncrypt(t *testing.T) {
 	for idx, testVector := range testVectors {
 		sampleNumber := idx + 1
 		t.Run(fmt.Sprintf("Sample%d", sampleNumber), func(t *testing.T) {
+
+			start := time.Now()
+			fmt.Println("ENCRYPTION BEGIN ")
 			key, err := hex.DecodeString(testVector.key)
 			if err != nil {
 				t.Fatalf("Unable to decode hex key: %v", testVector.key)
@@ -136,6 +140,9 @@ func TestEncrypt(t *testing.T) {
 				t.Fatalf("%v", err)
 			}
 
+			end := time.Now()
+			elapsed := end.Sub(start)
+			fmt.Println("ELAPSED::", elapsed)
 			if ciphertext != testVector.ciphertext {
 				t.Fatalf("\nSample%d\nRadix:\t\t%d\nKey:\t\t%s\nTweak:\t\t%s\nPlaintext:\t%s\nCiphertext:\t%s\nExpected:\t%s", sampleNumber, testVector.radix, testVector.key, testVector.tweak, testVector.plaintext, ciphertext, testVector.ciphertext)
 			}
@@ -194,6 +201,7 @@ func TestLong(t *testing.T) {
 		t.Fatalf("%v", err)
 	}
 
+	fmt.Println("CIPHER TEXT ", ciphertext)
 	decrypted, err := ff1.Decrypt(ciphertext)
 	if err != nil {
 		t.Fatalf("%v", err)
